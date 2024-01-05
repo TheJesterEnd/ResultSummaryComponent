@@ -1,34 +1,42 @@
-const para_reaction = document.querySelector("#para_reaction");
-const para_memory = document.querySelector("#para_memory");
-const para_verbal = document.querySelector("#para_verbal");
-const para_visual = document.querySelector("#para_visual");
-const h1 = document.querySelector("#h1");
+const p = document.querySelector("#p");
+const parentDiv = document.querySelector(".summary_content");
+
 async function foo() {
   try {
     let response = await fetch("data.json");
     if (!response.ok) throw new Error("Error");
     let data = await response.json();
 
-    return data.map((obj) => obj.score);
+    return data;
   } catch (error) {
-    para_reaction.textContent = error.message;
-    para_memory.textContent = error.message;
-    para_verbal.textContent = error.message;
-    para_visual.textContent = error.message;
+    p.textContent = error.message;
   }
 }
 async function main() {
   const result = await foo();
-  para_reaction.textContent = result[0];
-  para_memory.textContent = result[1];
-  para_verbal.textContent = result[2];
-  para_visual.textContent = result[3];
+  for (let i = 0; i < result.length; i++) {
+    parentDiv.innerHTML += ` <div class="specs ${result[
+      i
+    ].category.toLowerCase()}">
+    <div class="icon text_${result[i].category.toLowerCase()}">
+  <img src="${result[i].icon}" alt = "${result[i].category} photo">
+      <p>${result[i].category}</p>
+    </div>
+    <div class="numbers">
+      <p id="para_${result[i].category}">${result[i].score}</p>
+      <p>/100</p>
+    </div>
+    </div> `;
+  }
 }
 main();
 
 async function calculate() {
   const data = await foo();
-  const totalScore = data.reduce((acc, currentScore) => acc + currentScore, 0);
-  h1.textContent = Math.floor(totalScore / data.length);
+  const totalScore = data.reduce(
+    (acc, currentScore) => acc + currentScore.score,
+    0
+  );
+  p.textContent = Math.floor(totalScore / data.length);
 }
 calculate();
